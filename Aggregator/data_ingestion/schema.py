@@ -1,3 +1,5 @@
+# File: schema.py
+
 from sqlalchemy import create_engine, Column, Integer, String, Float, Date, Boolean, ForeignKey
 from sqlalchemy.orm import declarative_base, relationship
 
@@ -19,8 +21,7 @@ class Player(Base):
     jersey_number = Column(Integer)
 
     game_logs = relationship("GameLog", back_populates="player", cascade="all, delete-orphan")
-    seasonal_stats = relationship("SeasonalStats", back_populates="player", cascade="all, delete-orphan")
-    
+
 class Team(Base):
     __tablename__ = 'teams'
     team_abbr = Column(String(3), primary_key=True)
@@ -90,36 +91,28 @@ class GameLog(Base):
     
     player = relationship("Player", back_populates="game_logs")
 
-# class SeasonalStats(Base):
-#     __tablename__ = 'seasonal_stats'
-#     id = Column(Integer, primary_key=True)
-#     player_id = Column(String(50), ForeignKey('players.id'))
-#     season = Column(Integer)
-#     games_played = Column(Integer)
-#     games_started = Column(Integer)
+class TeamGameLog(Base):
+    __tablename__ = 'team_game_logs'
     
-#     # Offensive
-#     total_passing_yards = Column(Float, default=0)
-#     total_passing_tds = Column(Integer, default=0)
-#     total_rushing_yards = Column(Float, default=0)
-#     total_rushing_tds = Column(Integer, default=0)
-#     total_receiving_yards = Column(Float, default=0)
-#     total_receiving_tds = Column(Integer, default=0)
-#     total_targets = Column(Integer, default=0)
-#     total_receptions = Column(Integer, default=0)
-#     total_fumbles = Column(Integer, default=0)
-    
-#     # Defensive
-#     total_tackles = Column(Float, default=0)
-#     total_sacks = Column(Float, default=0)
-#     total_interceptions = Column(Integer, default=0)
-#     total_passes_defended = Column(Integer, default=0)
-    
-#     player = relationship("Player", back_populates="seasonal_stats")
+    id = Column(Integer, primary_key=True, autoincrement=True)
+    team_abbr = Column(String(3), ForeignKey('teams.team_abbr'), nullable=False)
+    season = Column(Integer, nullable=False)
+    week = Column(Integer, nullable=False)
+    season_type = Column(String(10), nullable=False)
+    opponent_team = Column(String(3))
 
-# class PlayerUpdateHistory(Base):
-#     __tablename__ = 'player_update_history'
-#     player_id = Column(String(50), ForeignKey('players.id'), primary_key=True)
-#     last_updated = Column(Date)
-#     last_game_log = Column(Date)
-#     needs_update = Column(Boolean, default=True)
+    # Aggregated numeric stats
+    completions = Column(Integer, default=0)
+    attempts = Column(Integer, default=0)
+    passing_yards = Column(Float, default=0)
+    passing_tds = Column(Integer, default=0)
+    interceptions = Column(Integer, default=0)
+    sacks = Column(Float, default=0)
+    sack_yards = Column(Float, default=0)
+    passing_first_downs = Column(Integer, default=0)
+    carries = Column(Integer, default=0)
+    rushing_yards = Column(Float, default=0)
+    rushing_tds = Column(Integer, default=0)
+    rushing_first_downs = Column(Integer, default=0)
+    rushing_epa = Column(Float, default=0)
+    special_teams_tds = Column(Integer, default=0)
